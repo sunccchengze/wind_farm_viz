@@ -1,4 +1,4 @@
-/* 全局 Plotly 暗色主题 + 辅助函数 */
+/* 全局 Plotly 暗色主题 + 辅助函数 — Navy Monochromatic */
 window.PD={
   paper_bgcolor:'#020617',plot_bgcolor:'#0b1220',
   font:{color:'#94a3b8',family:'"SF Pro Display","Inter",-apple-system,"PingFang SC",sans-serif'},
@@ -7,5 +7,8 @@ window.PD={
   hoverlabel:{bgcolor:'#0b1220',bordercolor:'#1e293b',font:{color:'#e2e8f0',size:12}}
 };
 window.PAx={color:'#94a3b8',gridcolor:'#1e293b',zerolinecolor:'#475569',linecolor:'#1e293b'};
+/* Sequential blue colorscale for heatmaps (replaces warm scales) */
+window.BlueSeq=[[0,'#0a0f1a'],[0.15,'#0f1d3a'],[0.3,'#1e3a6e'],[0.5,'#2563eb'],[0.7,'#38bdf8'],[0.85,'#7dd3fc'],[1,'#e0f2fe']];
+window.BlueSeqMid=[[0,'#0f172a'],[0.25,'#1e40af'],[0.5,'#3b82f6'],[0.75,'#38bdf8'],[1,'#e0f2fe']];
 function ml(o){const b=JSON.parse(JSON.stringify({paper_bgcolor:PD.paper_bgcolor,plot_bgcolor:PD.plot_bgcolor,font:PD.font,margin:PD.margin,legend:PD.legend,hoverlabel:PD.hoverlabel,xaxis:Object.assign({},PAx),yaxis:Object.assign({},PAx)}));(function d(t,s){for(const k in s){if(typeof s[k]==='object'&&s[k]&&!Array.isArray(s[k])){t[k]=t[k]||{};d(t[k],s[k]);}else t[k]=s[k];}})(b,o);return b;}
 function pr(id,tr,ly,cfg){Plotly.newPlot(id,tr,ml(ly),Object.assign({responsive:true,displayModeBar:'hover',modeBarButtonsToRemove:['lasso2d','select2d']},cfg||{}));}

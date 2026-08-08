@@ -25,8 +25,8 @@
     <div class="card">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="stat"><div class="v blue" id="ptYaw">–</div><div class="k">推荐偏航角</div></div>
-        <div class="stat"><div class="v green" id="ptPow">–</div><div class="k">实际总功率(kW)</div></div>
-        <div class="stat"><div class="v amber" id="ptErr">–</div><div class="k">跟踪误差</div></div>
+        <div class="stat"><div class="v cyan" id="ptPow">–</div><div class="k">实际总功率(kW)</div></div>
+        <div class="stat"><div class="v indigo" id="ptErr">–</div><div class="k">跟踪误差</div></div>
         <div class="stat"><div class="v" id="ptBase">–</div><div class="k">0° 基准(kW)</div></div>
       </div>
       <div class="note" style="margin-top:16px">接口契约：<span class="code" style="display:block;margin-top:8px">find_yaw_for_target(target_power, U_inf) -> (best_yaw, actual_power, error_pct)</span></div>
@@ -39,41 +39,33 @@
 (function(){
   const S=window.SURROGATE,m=window.WIND_DATA.multi;
   const ptU=document.getElementById('ptU'),ptT=document.getElementById('ptT');
-
   function render(){
-    const u=+ptU.value||8, t=+ptT.value||0;
-    const r=S.find_yaw_for_target(t,u);
+    const u=+ptU.value||8,t=+ptT.value||0,r=S.find_yaw_for_target(t,u);
     document.getElementById('ptYaw').textContent=r.yaw+'°';
     document.getElementById('ptPow').textContent=Math.round(r.ptot);
     document.getElementById('ptErr').textContent=(r.error>=0?'+':'')+r.error.toFixed(1)+'%';
     document.getElementById('ptBase').textContent=Math.round(r.base);
     document.getElementById('ptNote').innerHTML=`风速 ${u} m/s：基准(0°)≈${Math.round(r.base)} kW，推荐偏航 <b>${r.yaw}°</b> 后≈<b>${Math.round(r.ptot)} kW</b>。`;
-
-    // Gauge chart (semi-circle)
-    const maxP=Math.max(r.ptot,r.base,t)*1.15;
-    const frac=Math.max(0,Math.min(1,r.ptot/maxP));
-    const fracT=Math.max(0,Math.min(1,t/maxP));
-    const angV=180-frac*180, angT=180-fracT*180;
-    function arcR(cx,cy,r,a0,a1){const d2r=Math.PI/180;const x0=cx+r*Math.cos(a0*d2r),y0=cy+r*Math.sin(a0*d2r),x1=cx+r*Math.cos(a1*d2r),y1=cy+r*Math.sin(a1*d2r);return `M${x0} ${y0} A${r} ${r} 0 ${Math.abs(a1-a0)>180?1:0} 1 ${x1} ${y1}`;}
+    const maxP=Math.max(r.ptot,r.base,t)*1.15,frac=Math.max(0,Math.min(1,r.ptot/maxP)),fracT=Math.max(0,Math.min(1,t/maxP));
+    const angV=180-frac*180,angT=180-fracT*180;
+    function arcBarcR(cx,cy,r,a0,a1){const d2r=Math.PI/180;const x0=cx+r*Math.cos(a0*d2r),y0=cy+r*Math.sin(a0*d2r),x1=cx+r*Math.cos(a1*d2r),y1=cy+r*Math.sin(a1*d2r);return `M${x0} ${y0} A${r} ${r} 0 ${Math.abs(a1-a0)>180?1:0} 1 ${x1} ${y1}`;}
     const cx=200,cy=190,r=140;
+    // Cool gauge: deep blue → sky blue → cyan
+    const gCol=frac>=0.9?'#22d3ee':frac>=0.6?'#38bdf8':'#3b82f6';
     pr('gaugePlot',[
-      {type:'path',path:arcR(cx,cy,r,180,0),line:{color:'rgba(255,255,255,0.08)',width:22},fillcolor:'rgba(255,255,255,0.02)',showlegend:false},
-      {type:'path',path:arcR(cx,cy,r,180,angV),line:{color:frac>=0.9?'#34d399':frac>=0.6?'#fbbf24':'#f87171',width:22},fillcolor:'rgba(0,0,0,0)',showlegend:false},
-      {type:'path',path:arcR(cx,cy,r-40,angT-1,angT+1),line:{color:'#f59e0b',width:4},fillcolor:'rgba(0,0,0,0)',showlegend:false},
+      {type:'path',path:arcR(cx,cy,r,180,0),line:{color:'rgba(255,255,255,0.06)',width:22},fillcolor:'rgba(255,255,255,0.02)',showlegend:false},
+      {type:'path',path:arcR(cx,cy,r,180,angV),line:{color:gCol,width:22},fillcolor:'rgba(0,0,0,0)',showlegend:false},
+      {type:'path',path:arcR(cx,cy,r-40,angT-1,angT+1),line:{color:'#818cf8',width:4},fillcolor:'rgba(0,0,0,0)',showlegend:false},
       {x:[cx],y:[cy-30],mode:'text',text:[Math.round(r.ptot)+''],textfont:{size:28,color:'#e2e8f0',family:'SF Pro Display,Inter,sans-serif'},showlegend:false},
       {x:[cx],y:[cy-55],mode:'text',text:['实际总功率 (kW)'],textfont:{size:12,color:'#94a3b8'},showlegend:false},
-      {x:[cx],y:[cy+10],mode:'text',text:['目标 '+Math.round(t)+' kW'],textfont:{size:11,color:'#f59e0b'},showlegend:false}
-    ],{xaxis:{range:[0,400],showgrid:false,zeroline:false,showticklabels:false},yaxis:{range:[0,210],showgrid:false,zeroline:false,showticklabels:false},height:260,margin:{l:0,r:0,t:5,b:0},showlegend:false});
-
-    // Power curve with target line
+      {x:[cx],y:[cy+10],mode:'text',text:['目标 '+Math.round(t)+' kW'],textfont:{size:11,color:'#818cf8'},showlegend:false}],
+    {xaxis:{range:[0,400],showgrid:false,zeroline:false,showticklabels:false},yaxis:{range:[0,210],showgrid:false,zeroline:false,showticklabels:false},height:260,margin:{l:0,r:0,t:5,b:0},showlegend:false});
     const iU=m.wind_speeds.indexOf(u);
-    if(iU>=0){
-      pr('curvePlot',[
-        {x:m.yaw_angles,y:m.ptot[iU],mode:'lines',name:'总功率',line:{color:'#60a5fa',width:2.5},fill:'tozeroy',fillcolor:'rgba(96,165,250,0.06)'},
-        {x:[m.yaw_angles[0],m.yaw_angles[m.yaw_angles.length-1]],y:[t,t],mode:'lines',name:'目标',line:{color:'#f59e0b',width:1.5,dash:'dash'}},
-        {x:[r.yaw],y:[r.ptot],mode:'markers',name:'推荐',marker:{size:12,color:'#34d399',line:{color:'#fff',width:2}}}
-      ],{xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:220});
-    }
+    if(iU>=0){pr('curvePlot',[
+      {x:m.yaw_angles,y:m.ptot[iU],mode:'lines',name:'总功率',line:{color:'#38bdf8',width:2.5},fill:'tozeroy',fillcolor:'rgba(56,189,248,0.06)'},
+      {x:[m.yaw_angles[0],m.yaw_angles[m.yaw_angles.length-1]],y:[t,t],mode:'lines',name:'目标',line:{color:'#818cf8',width:1.5,dash:'dash'}},
+      {x:[r.yaw],y:[r.ptot],mode:'markers',name:'推荐',marker:{size:12,color:'#22d3ee',line:{color:'#0f172a',width:2}}}],
+      {xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:220});}
   }
   ptU.onchange=render;ptT.oninput=render;render();
 })();

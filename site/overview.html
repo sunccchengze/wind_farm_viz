@@ -24,16 +24,16 @@
   const W=window.WIND_DATA,m=W.multi;
   const us=m.wind_speeds,base=us.map(u=>{const i=m.wind_speeds.indexOf(u);return m.ptot[i][m.yaw_angles.indexOf(0)];});
   pr('barPlot',[{type:'bar',x:us.map(u=>u+' m/s'),y:base.map(v=>Math.round(v)),
-    marker:{color:'#60a5fa',line:{color:'#3b82f6',width:1}},hovertemplate:'%{x}: %{y} kW<extra></extra>'}],
+    marker:{color:'#38bdf8',line:{color:'#0ea5e9',width:1}},hovertemplate:'%{x}: %{y} kW<extra></extra>'}],
     {xaxis:{title:'来流风速'},yaxis:{title:'总功率 (kW)'},height:320,margin:{l:55,r:20,t:5,b:45},showlegend:false});
   const i8=m.wind_speeds.indexOf(8);
   pr('decompPlot',[
-    {x:m.yaw_angles,y:m.p1[i8],mode:'lines',name:'上游 P₁',line:{color:'#f59e0b',width:2}},
-    {x:m.yaw_angles,y:m.p2[i8],mode:'lines',name:'下游 P₂',line:{color:'#3b82f6',width:2}},
-    {x:m.yaw_angles,y:m.ptot[i8],mode:'lines',name:'总功率',line:{color:'#60a5fa',width:2.5}}
-  ],{xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:340});
+    {x:m.yaw_angles,y:m.p1[i8],mode:'lines',name:'上游 P₁',line:{color:'#818cf8',width:2}},
+    {x:m.yaw_angles,y:m.p2[i8],mode:'lines',name:'下游 P₂',line:{color:'#60a5fa',width:2}},
+    {x:m.yaw_angles,y:m.ptot[i8],mode:'lines',name:'总功率',line:{color:'#38bdf8',width:2.5}}],
+    {xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:340});
   const s=W.single,t=document.getElementById("tbl");
-  let h='<tr style="color:#60a5fa;font-weight:700;border-bottom:1px solid #1e293b"><th style="padding:6px 8px">偏航角</th><th>P₁ (kW)</th><th>P₂ (kW)</th><th>总功率</th></tr>';
+  let h='<tr style="color:#38bdf8;font-weight:700;border-bottom:1px solid #1e293b"><th style="padding:6px 8px">偏航角</th><th>P₁ (kW)</th><th>P₂ (kW)</th><th>总功率</th></tr>';
   s.yaw_angles.forEach((y,k)=>{h+=`<tr style="color:#94a3b8;border-bottom:1px solid rgba(30,41,59,0.13)"><td style="padding:4px 8px">${y}°</td><td>${Math.round(s.p1[k])}</td><td>${Math.round(s.p2[k])}</td><td style="color:#e2e8f0;font-weight:600">${Math.round(s.ptot[k])}</td></tr>`;});
   t.innerHTML=h;
 })();

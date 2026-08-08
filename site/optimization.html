@@ -12,7 +12,7 @@
   <div class="grid2">
     <div class="card">
       <div class="img-grid"><img src="assets/img/opt/before.png" alt="before"><img src="assets/img/opt/after.png" alt="after"></div>
-      <div class="note">左：偏航 0°（基准）；右：偏航 25°（推荐）。下游机尾流被推向侧方，受遮挡减弱，功率提升。</div>
+      <div class="note">左：偏航 0°（基准）；右：偏航 25°（推荐）。</div>
     </div>
     <div class="card">
       <div class="controls">
@@ -22,57 +22,41 @@
         <button class="btn" id="playBtn">▶ 播放</button>
       </div>
       <div id="scanField" class="plotly-container" style="height:280px"></div>
-      <div class="note">交互式偏航扫描：拖动滑块或点击播放，实时观察流场随偏航角变化。</div>
+      <div class="note">交互式偏航扫描：拖动滑块或点击播放。</div>
     </div>
   </div>
   <div class="card" style="margin-top:18px">
     <div id="optCurve" class="plotly-container" style="height:280px"></div>
-    <div class="note">功率-偏航曲线：红点随扫描移动，绿色虚线标记最优点。</div>
+    <div class="note">功率-偏航曲线：亮点随扫描移动，青色虚线标记最优点。</div>
   </div>
 </main>
 <footer class="wrap">孙承泽 · 可视化模块</footer>
 <script src="assets/data.js"></script><script src="assets/js/interp.js"></script><script src="assets/js/plotly-theme.js"></script><script src="assets/data_3d.js"></script>
 <script>
 (function(){
-  const m=window.WIND_DATA.multi,D3=window.WIND_3D_DATA,S=window.SURROGATE;
+  const m=window.WIND_DATA.multi,D3=window.WIND_3D_DATA,S=window.SURROGATE,BS=window.BlueSeq;
   const sl=document.getElementById('scanSlider'),lbl=document.getElementById('scanLabel');
-  let playing=false,animId=null;
-  const playBtn=document.getElementById('playBtn');
-
+  let playing=false,animId=null;const playBtn=document.getElementById('playBtn');
   function render(){
     const yaw=parseInt(sl.value);lbl.textContent=yaw+'°';
     const f2d=D3&&D3.fields_2d&&D3.fields_2d[String(yaw)];
-    if(f2d){
-      pr('scanField',[{type:'heatmap',x:f2d.x,y:f2d.y,z:f2d.u,colorscale:'RdBu_r',zmin:4,zmax:9,
-        colorbar:{title:{text:'m/s',side:'right'},thickness:10,len:0.7,x:1.02}}],
-        {xaxis:{title:'x (m)'},yaxis:{title:'y (m)'},height:280});
-    }
-    // Power curve with moving point
-    const i8=m.wind_speeds.indexOf(8);
-    const pred=S.predict_power(yaw,8);
+    if(f2d){pr('scanField',[{type:'heatmap',x:f2d.x,y:f2d.y,z:f2d.u,colorscale:BS,zmin:4,zmax:9,
+      colorbar:{title:{text:'m/s',side:'right'},thickness:10,len:0.7,x:1.02}}],{xaxis:{title:'x (m)'},yaxis:{title:'y (m)'},height:280});}
+    const i8=m.wind_speeds.indexOf(8),pred=S.predict_power(yaw,8);
     const optIdx=m.ptot[i8].indexOf(Math.max(...m.ptot[i8]));
     pr('optCurve',[
-      {x:m.yaw_angles,y:m.ptot[i8],mode:'lines',name:'总功率',line:{color:'#60a5fa',width:2.5},fill:'tozeroy',fillcolor:'rgba(96,165,250,0.08)'},
-      {x:m.yaw_angles,y:m.p1[i8],mode:'lines',name:'P₁',line:{color:'#f59e0b',width:1.5,dash:'dot'}},
-      {x:m.yaw_angles,y:m.p2[i8],mode:'lines',name:'P₂',line:{color:'#3b82f6',width:1.5,dash:'dot'}},
-      {x:[yaw],y:[pred.ptot],mode:'markers',name:'当前',marker:{size:14,color:'#f87171',line:{color:'#fff',width:2}}}
-    ],{xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:280,
-      annotations:[{x:m.yaw_angles[optIdx],y:m.ptot[i8][optIdx],text:'最优 '+m.yaw_angles[optIdx]+'°',showarrow:true,arrowhead:2,arrowcolor:'#34d399',font:{color:'#34d399',size:11},ax:0,ay:-25}]});
+      {x:m.yaw_angles,y:m.ptot[i8],mode:'lines',name:'总功率',line:{color:'#38bdf8',width:2.5},fill:'tozeroy',fillcolor:'rgba(56,189,248,0.08)'},
+      {x:m.yaw_angles,y:m.p1[i8],mode:'lines',name:'P₁',line:{color:'#818cf8',width:1.5,dash:'dot'}},
+      {x:m.yaw_angles,y:m.p2[i8],mode:'lines',name:'P₂',line:{color:'#60a5fa',width:1.5,dash:'dot'}},
+      {x:[yaw],y:[pred.ptot],mode:'markers',name:'当前',marker:{size:14,color:'#e0f2fe',line:{color:'#0f172a',width:2}}}],
+    {xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:280,
+      annotations:[{x:m.yaw_angles[optIdx],y:m.ptot[i8][optIdx],text:'最优 '+m.yaw_angles[optIdx]+'°',showarrow:true,arrowhead:2,arrowcolor:'#22d3ee',font:{color:'#22d3ee',size:11},ax:0,ay:-25}]});
   }
-
   sl.oninput=render;
-
   playBtn.onclick=()=>{
     if(playing){playing=false;playBtn.textContent='▶ 播放';if(animId)clearInterval(animId);return;}
-    playing=true;playBtn.textContent='⏸ 暂停';
-    sl.value=-30;
-    animId=setInterval(()=>{
-      let v=parseInt(sl.value)+5;
-      if(v>30){v=-30;}
-      sl.value=v;render();
-    },500);
-  };
-
+    playing=true;playBtn.textContent='⏸ 暂停';sl.value=-30;
+    animId=setInterval(()=>{let v=parseInt(sl.value)+5;if(v>30)v=-30;sl.value=v;render();},500);};
   render();
 })();
 </script>

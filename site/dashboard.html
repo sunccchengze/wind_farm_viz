@@ -17,100 +17,66 @@
     <div class="stat-card"><p class="stat-number">FLORIS</p><p class="stat-label">数据源</p></div>
   </div>
   <div class="grid2">
-    <div class="card">
-      <div class="controls" id="dBu"></div>
-      <div id="dCurve" class="plotly-container" style="height:340px"></div>
-      <div class="note">拖动偏航角，全场功率实时联动。接口：predict_power(yaw, U) — 未来 PINN 替换零改动。</div>
-    </div>
-    <div class="card">
-      <div id="dGauge" class="plotly-container" style="height:200px"></div>
+    <div class="card"><div class="controls" id="dBu"></div><div id="dCurve" class="plotly-container" style="height:340px"></div>
+      <div class="note">拖动偏航角，全场功率实时联动。</div></div>
+    <div class="card"><div id="dGauge" class="plotly-container" style="height:200px"></div>
       <div style="background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px;max-height:180px;overflow:auto;margin-top:8px">
-        <pre id="dJson" style="font-size:11px;color:#93c5fd;white-space:pre-wrap;line-height:1.5"></pre>
-      </div>
-      <div class="note">optimizer_result.json（洪祖名结果覆盖前为 FLORIS 占位）。</div>
-    </div>
+        <pre id="dJson" style="font-size:11px;color:#7dd3fc;white-space:pre-wrap;line-height:1.5"></pre></div>
+      <div class="note">optimizer_result.json（FLORIS 占位）。</div></div>
   </div>
   <div class="grid2" style="margin-top:18px">
-    <div class="card">
-      <div id="dAnim" class="plotly-container" style="height:300px"></div>
-      <div class="note">偏航角扫描动画：用滑块控制偏航角，流场和功率实时联动。</div>
-    </div>
+    <div class="card"><div id="dAnim" class="plotly-container" style="height:300px"></div>
+      <div class="note">偏航角扫描动画。</div></div>
     <div class="card"><div class="note" style="margin-top:0">
       <b>数据接口状态</b><br>
-      • <code>cases.csv</code>：单风速(8m/s) ✅<br>
-      • <code>cases_multi.csv</code>：多风速 ✅<br>
-      • <code>fields_3d/</code>：3D 流场 ✅<br>
-      • <code>cases_array.csv</code>：3×3 阵列 ✅<br>
-      • <code>surrogate_model.py</code>：插值接口稳定，待 PINN 替换 ✅<br>
-      • <b>闭环状态</b>：数据已接入 → 插值已运行 → 优化结果待接入 → 可视化完整。
-    </div></div>
+      • <code>cases.csv</code> ✅ • <code>cases_multi.csv</code> ✅ • <code>fields_3d/</code> ✅ • <code>cases_array.csv</code> ✅<br>
+      • <b>闭环</b>：数据已接入 → 插值已运行 → 优化待接入 → 可视化完整。</div></div>
   </div>
 </main>
 <footer class="wrap">孙承泽 · 可视化模块</footer>
 <script src="assets/data.js"></script><script src="assets/js/interp.js"></script><script src="assets/js/plotly-theme.js"></script><script src="assets/data_3d.js"></script>
 <script>
 (function(){
-  const m=window.WIND_DATA.multi,S=window.SURROGATE,D3=window.WIND_3D_DATA;
+  const m=window.WIND_DATA.multi,S=window.SURROGATE,D3=window.WIND_3D_DATA,BS=window.BlueSeq;
   document.getElementById('k1').textContent=m.wind_speeds.length*m.yaw_angles.length;
   document.getElementById('k2').textContent=m.wind_speeds[0]+'~'+m.wind_speeds[m.wind_speeds.length-1]+' m/s';
   document.getElementById('k3').textContent=m.yaw_angles[0]+'°~'+m.yaw_angles[m.yaw_angles.length-1]+'°';
-  let maxP=0;m.ptot.forEach(r=>r.forEach(v=>{if(v>maxP)maxP=v;}));
-  document.getElementById('k4').textContent=Math.round(maxP);
-
-  let U=m.wind_speeds[1],yawV=0;
-  const box=document.getElementById('dBu');
+  let maxP=0;m.ptot.forEach(r=>r.forEach(v=>{if(v>maxP)maxP=v;}));document.getElementById('k4').textContent=Math.round(maxP);
+  let U=m.wind_speeds[1],yawV=0;const box=document.getElementById('dBu');
   m.wind_speeds.forEach(u=>{const b=document.createElement('button');b.className='btn'+(u===U?' active':'');b.textContent=u+' m/s';
     b.onclick=()=>{U=u;[...box.querySelectorAll('.btn')].forEach(x=>x.classList.remove('active'));b.classList.add('active');render();};box.appendChild(b);});
-
-  // Add yaw slider
   const sl=document.createElement('input');sl.type='range';sl.min=-30;sl.max=30;sl.value=0;sl.step=5;sl.style.width='160px';
-  const slLbl=document.createElement('span');slLbl.style.cssText='font-size:13px;font-weight:700;color:#60a5fa;margin-left:8px';slLbl.textContent='0°';
+  const slLbl=document.createElement('span');slLbl.style.cssText='font-size:13px;font-weight:700;color:#38bdf8;margin-left:8px';slLbl.textContent='0°';
   const slWrap=document.createElement('label');slWrap.textContent='偏航角 ';slWrap.style.cssText='font-size:13px;color:#94a3b8;margin-left:16px';
   slWrap.appendChild(sl);slWrap.appendChild(slLbl);box.appendChild(slWrap);
   sl.oninput=()=>{yawV=parseInt(sl.value);slLbl.textContent=yawV+'°';render();};
-
   function arcR(cx,cy,r,a0,a1){const d2r=Math.PI/180;const x0=cx+r*Math.cos(a0*d2r),y0=cy+r*Math.sin(a0*d2r),x1=cx+r*Math.cos(a1*d2r),y1=cy+r*Math.sin(a1*d2r);return `M${x0} ${y0} A${r} ${r} 0 ${Math.abs(a1-a0)>180?1:0} 1 ${x1} ${y1}`;}
-
   function render(){
-    const i=m.wind_speeds.indexOf(U);
-    const pred=S.predict_power(yawV,U);
-    const base=S.predict_power(0,U);
+    const i=m.wind_speeds.indexOf(U),pred=S.predict_power(yawV,U),base=S.predict_power(0,U);
     const gain=((pred.ptot-base.ptot)/base.ptot*100);
-
-    // Power curve
     let optIdx=0;m.ptot[i].forEach((v,k)=>{if(v>m.ptot[i][optIdx])optIdx=k;});
     pr('dCurve',[
-      {x:m.yaw_angles,y:m.p1[i],mode:'lines',name:'P₁',line:{color:'#f59e0b',width:2}},
-      {x:m.yaw_angles,y:m.p2[i],mode:'lines',name:'P₂',line:{color:'#3b82f6',width:2}},
-      {x:m.yaw_angles,y:m.ptot[i],mode:'lines',name:'总功率',line:{color:'#60a5fa',width:2.5}},
-      {x:[yawV],y:[pred.ptot],mode:'markers',name:'当前',marker:{size:14,color:'#f87171',line:{color:'#fff',width:2}}}
-    ],{xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:340,
-      annotations:[{x:m.yaw_angles[optIdx],y:m.ptot[i][optIdx],text:'最优 '+m.yaw_angles[optIdx]+'°',showarrow:true,arrowhead:2,arrowcolor:'#34d399',font:{color:'#34d399',size:11},ax:0,ay:-30}]});
-
-    // Gauge
-    const maxG=Math.max(pred.ptot,base.ptot)*1.15;
-    const frac=Math.max(0,Math.min(1,pred.ptot/maxG));
-    const angV=180-frac*180;
+      {x:m.yaw_angles,y:m.p1[i],mode:'lines',name:'P₁',line:{color:'#818cf8',width:2}},
+      {x:m.yaw_angles,y:m.p2[i],mode:'lines',name:'P₂',line:{color:'#60a5fa',width:2}},
+      {x:m.yaw_angles,y:m.ptot[i],mode:'lines',name:'总功率',line:{color:'#38bdf8',width:2.5}},
+      {x:[yawV],y:[pred.ptot],mode:'markers',name:'当前',marker:{size:14,color:'#e0f2fe',line:{color:'#0f172a',width:2}}}],
+      {xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:340,
+        annotations:[{x:m.yaw_angles[optIdx],y:m.ptot[i][optIdx],text:'最优 '+m.yaw_angles[optIdx]+'°',showarrow:true,arrowhead:2,arrowcolor:'#22d3ee',font:{color:'#22d3ee',size:11},ax:0,ay:-30}]});
+    const maxG=Math.max(pred.ptot,base.ptot)*1.15,frac=Math.max(0,Math.min(1,pred.ptot/maxG)),angV=180-frac*180;
     const cx=160,cy=140,r=110;
+    const gCol=gain>5?'#22d3ee':gain>0?'#38bdf8':'#3b82f6';
     pr('dGauge',[
-      {type:'path',path:arcR(cx,cy,r,180,0),line:{color:'rgba(255,255,255,0.08)',width:18},fillcolor:'rgba(255,255,255,0.02)',showlegend:false},
-      {type:'path',path:arcR(cx,cy,r,180,angV),line:{color:gain>5?'#34d399':gain>0?'#fbbf24':'#f87171',width:18},fillcolor:'rgba(0,0,0,0)',showlegend:false},
+      {type:'path',path:arcR(cx,cy,r,180,0),line:{color:'rgba(255,255,255,0.06)',width:18},fillcolor:'rgba(255,255,255,0.02)',showlegend:false},
+      {type:'path',path:arcR(cx,cy,r,180,angV),line:{color:gCol,width:18},fillcolor:'rgba(0,0,0,0)',showlegend:false},
       {x:[cx],y:[cy-20],mode:'text',text:[Math.round(pred.ptot)+' kW'],textfont:{size:22,color:'#e2e8f0'},showlegend:false},
-      {x:[cx],y:[cy+5],mode:'text',text:[(gain>=0?'+':'')+gain.toFixed(1)+'% 增益'],textfont:{size:12,color:gain>0?'#34d399':'#f87171'},showlegend:false}
-    ],{xaxis:{range:[0,320],showgrid:false,zeroline:false,showticklabels:false},yaxis:{range:[0,170],showgrid:false,zeroline:false,showticklabels:false},height:200,margin:{l:0,r:0,t:5,b:0},showlegend:false});
-
-    // Animated flow field
+      {x:[cx],y:[cy+5],mode:'text',text:[(gain>=0?'+':'')+gain.toFixed(1)+'% 增益'],textfont:{size:12,color:gain>0?'#22d3ee':'#818cf8'},showlegend:false}],
+      {xaxis:{range:[0,320],showgrid:false,zeroline:false,showticklabels:false},yaxis:{range:[0,170],showgrid:false,zeroline:false,showticklabels:false},height:200,margin:{l:0,r:0,t:5,b:0},showlegend:false});
     const f2d=D3&&D3.fields_2d&&D3.fields_2d[String(yawV)];
-    if(f2d){
-      pr('dAnim',[{
-        type:'heatmap',x:f2d.x,y:f2d.y,z:f2d.u,colorscale:'RdBu_r',zmin:4,zmax:9,
-        colorbar:{title:{text:'m/s',side:'right'},thickness:10,len:0.7,x:1.02},
-        hovertemplate:'x:%{x:.0f} y:%{y:.0f} u:%{z:.1f}<extra></extra>'
-      }],{xaxis:{title:'x (m)'},yaxis:{title:'y (m)'},height:300});
-    }
+    if(f2d){pr('dAnim',[{type:'heatmap',x:f2d.x,y:f2d.y,z:f2d.u,colorscale:BS,zmin:4,zmax:9,
+      colorbar:{title:{text:'m/s',side:'right'},thickness:10,len:0.7,x:1.02},hovertemplate:'x:%{x:.0f} y:%{y:.0f} u:%{z:.1f}<extra></extra>'}],
+      {xaxis:{title:'x (m)'},yaxis:{title:'y (m)'},height:300});}
   }
-  render();
-  document.getElementById('dJson').textContent=JSON.stringify(window.WIND_DATA.opt,null,2);
+  render();document.getElementById('dJson').textContent=JSON.stringify(window.WIND_DATA.opt,null,2);
 })();
 </script>
 <script src="assets/js/nav.js"></script>

@@ -14,34 +14,30 @@
     <div id="solChart" class="plotly-container" style="height:380px"></div>
     <div class="grid3" style="margin-top:16px">
       <div class="stat"><div class="v blue" id="solYaw">–</div><div class="k">最优偏航角</div></div>
-      <div class="stat"><div class="v green" id="solPow">–</div><div class="k">全场最大功率(kW)</div></div>
-      <div class="stat"><div class="v amber" id="solGain">–</div><div class="k">相对 0° 增益</div></div>
+      <div class="stat"><div class="v cyan" id="solPow">–</div><div class="k">全场最大功率(kW)</div></div>
+      <div class="stat"><div class="v indigo" id="solGain">–</div><div class="k">相对 0° 增益</div></div>
     </div>
-    <div class="note">网格搜索思路：枚举 γ₁∈[−30°,30°]，调代理模型预测 P₁/P₂，选 argmax(P₁+P₂)。开学后接洪祖名真实优化算法。</div>
+    <div class="note">网格搜索：枚举 γ₁∈[−30°,30°]，选 argmax(P₁+P₂)。</div>
   </div>
 </main>
 <footer class="wrap">孙承泽 · 可视化模块</footer>
 <script src="assets/data.js"></script><script src="assets/js/interp.js"></script><script src="assets/js/plotly-theme.js"></script>
 <script>
 (function(){
-  const m=window.WIND_DATA.multi,ys=m.yaw_angles;
-  let U=m.wind_speeds[1];
+  const m=window.WIND_DATA.multi,ys=m.yaw_angles;let U=m.wind_speeds[1];
   const box=document.getElementById("solU");
   m.wind_speeds.forEach(u=>{const b=document.createElement("button");b.className="btn"+(u===U?" active":"");b.textContent=u+" m/s";
     b.onclick=()=>{U=u;[...box.children].forEach(x=>x.classList.remove("active"));b.classList.add("active");render();};box.appendChild(b);});
   function render(){
-    const i=m.wind_speeds.indexOf(U);
-    let bi=0;m.ptot[i].forEach((v,k)=>{if(v>m.ptot[i][bi])bi=k;});
+    const i=m.wind_speeds.indexOf(U);let bi=0;m.ptot[i].forEach((v,k)=>{if(v>m.ptot[i][bi])bi=k;});
     const p0=m.ptot[i][ys.indexOf(0)];
     pr('solChart',[
-      {x:ys,y:m.p1[i],mode:'lines',name:'P₁',line:{color:'#f59e0b',width:2}},
-      {x:ys,y:m.p2[i],mode:'lines',name:'P₂',line:{color:'#3b82f6',width:2}},
-      {x:ys,y:m.ptot[i],mode:'lines',name:'总功率',line:{color:'#60a5fa',width:2.5}},
-      {x:[ys[bi]],y:[m.ptot[i][bi]],mode:'markers',name:'最优',
-       marker:{size:14,color:'#f87171',line:{color:'#fff',width:2}}}
-    ],{xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:380,
-      annotations:[{x:ys[bi],y:m.ptot[i][bi],text:'最优 '+ys[bi]+'°',
-        showarrow:true,arrowhead:2,arrowcolor:'#34d399',font:{color:'#34d399',size:11},ax:0,ay:-30}]});
+      {x:ys,y:m.p1[i],mode:'lines',name:'P₁',line:{color:'#818cf8',width:2}},
+      {x:ys,y:m.p2[i],mode:'lines',name:'P₂',line:{color:'#60a5fa',width:2}},
+      {x:ys,y:m.ptot[i],mode:'lines',name:'总功率',line:{color:'#38bdf8',width:2.5}},
+      {x:[ys[bi]],y:[m.ptot[i][bi]],mode:'markers',name:'最优',marker:{size:14,color:'#e0f2fe',line:{color:'#0f172a',width:2}}}],
+    {xaxis:{title:'偏航角 (°)'},yaxis:{title:'功率 (kW)'},height:380,
+      annotations:[{x:ys[bi],y:m.ptot[i][bi],text:'最优 '+ys[bi]+'°',showarrow:true,arrowhead:2,arrowcolor:'#22d3ee',font:{color:'#22d3ee',size:11},ax:0,ay:-30}]});
     document.getElementById("solYaw").textContent=ys[bi]+"°";
     document.getElementById("solPow").textContent=Math.round(m.ptot[i][bi]);
     document.getElementById("solGain").textContent="+"+((m.ptot[i][bi]-p0)/p0*100).toFixed(1)+"%";

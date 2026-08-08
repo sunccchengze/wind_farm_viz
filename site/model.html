@@ -2,7 +2,6 @@
 <html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>模型精度 · 风电场偏航优化</title>
 <link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script><script src="assets/js/plotly-theme.js" defer></script>
 </head>
 <body>
 <nav><div class="nav-inner"><div class="brand">风电场偏航优化<br><span style="font-size:11px;color:var(--sub)">可视化模块</span></div>
@@ -10,22 +9,18 @@
 <section class="wrap pg-hero"><h1>🎯 模型精度</h1><p>厉今飞基线 + 洪祖名 XGBoost 优化 · 代理模型质量佐证</p></section>
 <main class="wrap">
   <div class="grid2">
-    <div class="card">
-      <img src="assets/img/true_vs_pred_farm_power.png" style="width:100%" alt="真实vs预测">
-      <div class="note">真实 vs 预测全场功率散点图。R² &gt; 0.99996，XGBoost 模型近乎完美拟合。</div>
-    </div>
-    <div class="card">
-      <img src="assets/img/residual_gch_xgb_tuned.png" style="width:100%" alt="残差">
-      <div class="note">残差分布。全场 MAE 从 86.5/103.1 kW 降至 <span class="good">7.79 / 10.49 kW</span>（约 11 倍提升）。</div>
-    </div>
+    <div class="card"><img src="assets/img/true_vs_pred_farm_power.png" style="width:100%" alt="真实vs预测">
+      <div class="note">真实 vs 预测全场功率散点图。R² &gt; 0.99996。</div></div>
+    <div class="card"><img src="assets/img/residual_gch_xgb_tuned.png" style="width:100%" alt="残差">
+      <div class="note">残差分布。MAE 从 86.5/103.1 kW 降至 <span class="good">7.79 / 10.49 kW</span>。</div></div>
   </div>
   <div class="card" style="margin-top:18px">
     <div class="grid3">
-      <div class="stat"><div class="v green">7.79</div><div class="k">P₁ MAE (kW)</div></div>
-      <div class="stat"><div class="v green">10.49</div><div class="k">P₂ MAE (kW)</div></div>
+      <div class="stat"><div class="v cyan">7.79</div><div class="k">P₁ MAE (kW)</div></div>
+      <div class="stat"><div class="v cyan">10.49</div><div class="k">P₂ MAE (kW)</div></div>
       <div class="stat"><div class="v blue">>0.9999</div><div class="k">R²</div></div>
     </div>
-    <div class="note">洪祖名在厉今飞 MLP 基线之上做模型选择（XGBoost / GPR / MLP / 两阶段，5-fold CV），最终选定 XGBoost。</div>
+    <div class="note">洪祖名 XGBoost 模型选择结果。</div>
   </div>
 </main>
 <footer class="wrap">孙承泽 · 可视化模块</footer>

@@ -11,18 +11,18 @@
 <main class="wrap">
   <div class="card">
     <div id="heatPlot" class="plotly-container" style="height:500px"></div>
-    <div class="note">偏航角 × 风速功率增益热力图。悬停查看具体增益值。颜色越深增益越大，最优点在 +25° / 8 m/s 附近。</div>
+    <div class="note">偏航角 × 风速功率增益热力图。颜色越亮增益越大。</div>
   </div>
   <div class="grid2" style="margin-top:18px">
     <div class="card">
       <div class="controls"><label>选择风速</label><select id="wsSel"></select></div>
       <div id="slicePlot" class="plotly-container" style="height:300px"></div>
-      <div class="note">选定风速下的增益曲线（%），最优点用虚线标记。</div>
+      <div class="note">选定风速下的增益曲线（%）。</div>
     </div>
     <div class="card">
       <div class="controls"><label>选择偏航角</label><select id="yawSel"></select></div>
       <div id="yawSlicePlot" class="plotly-container" style="height:300px"></div>
-      <div class="note">选定偏航角下增益随风速变化（%），展示不同风速区间的优化效果。</div>
+      <div class="note">选定偏航角下增益随风速变化（%）。</div>
     </div>
   </div>
 </main>
@@ -30,74 +30,26 @@
 <script src="assets/data.js"></script><script src="assets/data_3d.js"></script>
 <script>
 (function(){
-  const D3=window.WIND_3D_DATA;
-  const hm=D3&&D3.heatmap;
-  const W=window.WIND_DATA,m=W.multi;
+  const D3=window.WIND_3D_DATA,hm=D3&&D3.heatmap,W=window.WIND_DATA,m=W.multi,BSM=window.BlueSeqMid;
   let ws,yas,gain;
-  if(hm&&hm.gain_pct&&hm.gain_pct.length>0){
-    ws=hm.wind_speeds;yas=hm.yaw_angles;gain=hm.gain_pct;
-  }else{
-    ws=m.wind_speeds;yas=m.yaw_angles;
-    gain=ws.map((u,i)=>yas.map((y,j)=>{
-      const base=m.ptot[i][yas.indexOf(0)];
-      return base>0?((m.ptot[i][j]-base)/base*100):0;
-    }));
-  }
-
-  // Heatmap
-  const yLabels=yas.map(y=>y+'°');
-  const xLabels=ws.map(u=>u+' m/s');
-  pr('heatPlot',[{
-    type:'heatmap',x:xLabels,y:yLabels,z:gain,
-    colorscale:[[0,'#1e293b'],[0.3,'#3b82f6'],[0.6,'#34d399'],[1,'#fbbf24']],
+  if(hm&&hm.gain_pct&&hm.gain_pct.length>0){ws=hm.wind_speeds;yas=hm.yaw_angles;gain=hm.gain_pct;}
+  else{ws=m.wind_speeds;yas=m.yaw_angles;gain=ws.map((u,i)=>yas.map((y,j)=>{const base=m.ptot[i][yas.indexOf(0)];return base>0?((m.ptot[i][j]-base)/base*100):0;}));}
+  pr('heatPlot',[{type:'heatmap',x:ws.map(u=>u+' m/s'),y:yas.map(y=>y+'°'),z:gain,colorscale:BSM,
     hovertemplate:'风速 %{x}  偏航 %{y}  增益 %{z:.2f}%<extra></extra>',
-    colorbar:{title:{text:'增益 (%)',side:'right'},thickness:15,len:0.85,x:1.02}
-  }],{
-    xaxis:{title:'来流风速 (m/s)'},yaxis:{title:'上游偏航角 (°)'},
-    height:500,margin:{l:60,r:70,t:20,b:50}
-  });
-
-  // Wind speed slice
+    colorbar:{title:{text:'增益 (%)',side:'right'},thickness:15,len:0.85,x:1.02}}],
+    {xaxis:{title:'来流风速 (m/s)'},yaxis:{title:'上游偏航角 (°)'},height:500,margin:{l:60,r:70,t:20,b:50}});
   const wsSel=document.getElementById('wsSel');
-  ws.forEach(u=>{const o=document.createElement('option');o.value=u;o.textContent=u+' m/s';wsSel.appendChild(o);});
-  wsSel.value=8;
-
-  function renderWsSlice(){
-    const u=parseFloat(wsSel.value);
-    const i=ws.indexOf(u);if(i<0)return;
-    const g=gain[i];
-    const optIdx=g.indexOf(Math.max(...g));
-    pr('slicePlot',[{
-      x:yas,y:g,mode:'lines+markers',name:'增益',
-      line:{color:'#60a5fa',width:2.5},marker:{size:6,color:'#60a5fa'},
-      fill:'tozeroy',fillcolor:'rgba(96,165,250,0.08)'
-    }],{
-      xaxis:{title:'偏航角 (°)'},yaxis:{title:'增益 (%)',zeroline:true,zerolinecolor:'#475569'},
-      height:300,
-      annotations:[{x:yas[optIdx],y:g[optIdx],text:'最优 '+yas[optIdx]+'°',
-        showarrow:true,arrowhead:2,arrowcolor:'#34d399',font:{color:'#34d399',size:11},ax:0,ay:-25}]
-    });
-  }
+  ws.forEach(u=>{const o=document.createElement('option');o.value=u;o.textContent=u+' m/s';wsSel.appendChild(o);});wsSel.value=8;
+  function renderWsSlice(){const u=parseFloat(wsSel.value),i=ws.indexOf(u);if(i<0)return;const g=gain[i],optIdx=g.indexOf(Math.max(...g));
+    pr('slicePlot',[{x:yas,y:g,mode:'lines+markers',name:'增益',line:{color:'#38bdf8',width:2.5},marker:{size:6,color:'#38bdf8'},fill:'tozeroy',fillcolor:'rgba(56,189,248,0.08)'}],
+      {xaxis:{title:'偏航角 (°)'},yaxis:{title:'增益 (%)',zeroline:true,zerolinecolor:'#475569'},height:300,
+        annotations:[{x:yas[optIdx],y:g[optIdx],text:'最优 '+yas[optIdx]+'°',showarrow:true,arrowhead:2,arrowcolor:'#22d3ee',font:{color:'#22d3ee',size:11},ax:0,ay:-25}]});}
   wsSel.onchange=renderWsSlice;renderWsSlice();
-
-  // Yaw slice
   const yawSel=document.getElementById('yawSel');
-  yas.forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y+'°';yawSel.appendChild(o);});
-  yawSel.value=25;
-
-  function renderYawSlice(){
-    const y=parseFloat(yawSel.value);
-    const j=yas.indexOf(y);if(j<0)return;
-    const g=ws.map((_,i)=>gain[i][j]);
-    pr('yawSlicePlot',[{
-      x:ws,y:g,mode:'lines+markers',name:'增益',
-      line:{color:'#34d399',width:2.5},marker:{size:6,color:'#34d399'},
-      fill:'tozeroy',fillcolor:'rgba(52,211,153,0.08)'
-    }],{
-      xaxis:{title:'风速 (m/s)'},yaxis:{title:'增益 (%)',zeroline:true,zerolinecolor:'#475569'},
-      height:300
-    });
-  }
+  yas.forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y+'°';yawSel.appendChild(o);});yawSel.value=25;
+  function renderYawSlice(){const y=parseFloat(yawSel.value),j=yas.indexOf(y);if(j<0)return;const g=ws.map((_,i)=>gain[i][j]);
+    pr('yawSlicePlot',[{x:ws,y:g,mode:'lines+markers',name:'增益',line:{color:'#22d3ee',width:2.5},marker:{size:6,color:'#22d3ee'},fill:'tozeroy',fillcolor:'rgba(34,211,238,0.08)'}],
+      {xaxis:{title:'风速 (m/s)'},yaxis:{title:'增益 (%)',zeroline:true,zerolinecolor:'#475569'},height:300});}
   yawSel.onchange=renderYawSlice;renderYawSlice();
 })();
 </script>
