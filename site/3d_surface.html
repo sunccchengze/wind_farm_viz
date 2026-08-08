@@ -6,7 +6,7 @@
 </head>
 <body>
 <nav><div class="nav-inner"><div class="brand">风电场偏航优化<br><span style="font-size:11px;color:var(--sub)">可视化模块</span></div>
-<div class="nav-links"><a href="index.html">首页</a><a href="wake.html">尾流</a><a href="optimization.html">优化</a><a href="overview.html">总览</a><a href="3d_surface.html" class="active">3D曲面</a><a href="3d_volume.html">3D体</a><a href="heatmap.html">热力矩阵</a><a href="solver.html">求解器</a><a href="pod.html">POD</a><a href="array.html">阵列</a><a href="power_tracking.html">功率跟踪</a><a href="dashboard.html">Dashboard</a><a href="windrose.html">风玫瑰</a><a href="model.html">模型精度</a><a href="interface.html">接口</a></div></div></nav>
+<div class="nav-links"></div></div></nav>
 <section class="wrap pg-hero"><h1>🌐 3D 尾流曲面</h1><p>三维速度曲面可视化，鼠标拖拽旋转，直观感受尾流空间结构</p></section>
 <main class="wrap">
   <div class="card">
@@ -40,7 +40,6 @@
   const keys=Object.keys(D3.fields_3d).sort((a,b)=>parseFloat(a)-parseFloat(b));
   const yawSel=document.getElementById('yawSel');
   keys.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=parseFloat(k)+'°';yawSel.appendChild(o);});
-  // 默认选 0° 附近的
   const defKey=keys.find(k=>parseFloat(k)===0)||keys[Math.floor(keys.length/2)];
   yawSel.value=defKey;
 
@@ -52,11 +51,9 @@
     const fd=D3.fields_3d[yaw];
     if(!fd)return;
     const x=fd.x, y=fd.y, u=fd.u;
-    // u shape: [n_z, n_y, n_x], 取中间高度层
     const midZ=Math.floor(u.length/2);
-    const uSlice=u[midZ]; // [n_y, n_x]
+    const uSlice=u[midZ];
     const traces=[];
-    // 3D Surface
     traces.push({
       type:'surface',x:x,y:y,z:uSlice,
       colorscale:cs,cmin:4,cmax:9,

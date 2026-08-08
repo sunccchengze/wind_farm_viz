@@ -2,11 +2,11 @@
 <html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Master Dashboard · 风电场偏航优化</title>
 <link rel="stylesheet" href="css/style.css">
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script><script src="assets/js/plotly-theme.js" defer></script>
 </head>
 <body>
 <nav><div class="nav-inner"><div class="brand">风电场偏航优化<br><span style="font-size:11px;color:var(--sub)">可视化模块</span></div>
-<div class="nav-links"><a href="index.html">首页</a><a href="wake.html">尾流</a><a href="optimization.html">优化</a><a href="overview.html">总览</a><a href="3d_surface.html">3D曲面</a><a href="3d_volume.html">3D体</a><a href="heatmap.html">热力矩阵</a><a href="solver.html">求解器</a><a href="pod.html">POD</a><a href="array.html">阵列</a><a href="power_tracking.html">功率跟踪</a><a href="dashboard.html" class="active">Dashboard</a><a href="windrose.html">风玫瑰</a><a href="model.html">模型精度</a><a href="interface.html">接口</a></div></div></nav>
+<div class="nav-links"></div></div></nav>
 <section class="wrap pg-hero"><h1>🧭 Master Dashboard</h1><p>数据-物理-控制闭环审查面板 · 实时仪表盘</p></section>
 <main class="wrap">
   <div class="stats-bar" style="grid-template-columns:repeat(5,1fr)">
@@ -24,7 +24,7 @@
     </div>
     <div class="card">
       <div id="dGauge" class="plotly-container" style="height:200px"></div>
-      <div style="background:#020617;border:1px solid var(--line);border-radius:12px;padding:12px;max-height:180px;overflow:auto;margin-top:8px">
+      <div style="background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px;max-height:180px;overflow:auto;margin-top:8px">
         <pre id="dJson" style="font-size:11px;color:#93c5fd;white-space:pre-wrap;line-height:1.5"></pre>
       </div>
       <div class="note">optimizer_result.json（洪祖名结果覆盖前为 FLORIS 占位）。</div>
@@ -60,7 +60,7 @@
   let U=m.wind_speeds[1],yawV=0;
   const box=document.getElementById('dBu');
   m.wind_speeds.forEach(u=>{const b=document.createElement('button');b.className='btn'+(u===U?' active':'');b.textContent=u+' m/s';
-    b.onclick=()=>{U=u;[...box.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');render();};box.appendChild(b);});
+    b.onclick=()=>{U=u;[...box.querySelectorAll('.btn')].forEach(x=>x.classList.remove('active'));b.classList.add('active');render();};box.appendChild(b);});
 
   // Add yaw slider
   const sl=document.createElement('input');sl.type='range';sl.min=-30;sl.max=30;sl.value=0;sl.step=5;sl.style.width='160px';

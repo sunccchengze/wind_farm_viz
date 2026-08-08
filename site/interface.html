@@ -5,7 +5,7 @@
 </head>
 <body>
 <nav><div class="nav-inner"><div class="brand">风电场偏航优化<br><span style="font-size:11px;color:var(--sub)">可视化模块</span></div>
-<div class="nav-links"><a href="index.html">首页</a><a href="wake.html">尾流</a><a href="optimization.html">优化</a><a href="overview.html">总览</a><a href="3d_surface.html">3D曲面</a><a href="3d_volume.html">3D体</a><a href="heatmap.html">热力矩阵</a><a href="solver.html">求解器</a><a href="pod.html">POD</a><a href="array.html">阵列</a><a href="power_tracking.html">功率跟踪</a><a href="dashboard.html">Dashboard</a><a href="windrose.html">风玫瑰</a><a href="model.html">模型精度</a><a href="interface.html" class="active">接口</a></div></div></nav>
+<div class="nav-links"></div></div></nav>
 <section class="wrap pg-hero"><h1>🔌 统一数据接口</h1><p>与各组的契约（预先固定，降低格式错配风险）</p></section>
 <main class="wrap">
   <div class="grid2">
@@ -32,12 +32,12 @@
     <div class="card"><div class="note" style="margin-top:0">
       <b style="color:var(--txt)">数据文件来源与替换计划：</b><br><br>
       • <code>cases.csv</code> / <code>cases_array.csv</code>：我用 FLORIS 生成的占位数据。<br><br>
-      • <code>optimizer_result.json</code> / <code>array_in&dependent_result.json</code>：FLORIS 结果；<span class="good">未来用洪祖名真实优化器结果覆盖，界面数字自动更新</span>。<br><br>
+      • <code>optimizer_result.json</code> / <code>array_independent_result.json</code>：FLORIS 结果；<span class="good">未来用洪祖名真实优化器结果覆盖，界面数字自动更新</span>。<br><br>
       • <code>fields/</code> 系列：田铭雨 FLORIS 工程尾流（演示数据）；高保真到位后仅换图。<br><br>
       • <b>真实链路</b>：田铭雨 CFD →F→ 袁夫达 NN 训练 → 洪祖名优化 → 我可视化。<br><br>
       <b style="color:var(--txt)">已对齐假期前 PPT 的统一接口规范：</b><br><br>
-      • <code>optimizer_result.json</code> 字段 = <code>wind_speed, original_yaw, recommended_yaw, power_before, power_after, wake_field</code>（前 5 项已落地，<code>wake_field</code> 待田铭雨 CFD 提供后仅换图）。<br><br>
-      • <code>cases.csv</code> 最小字段（PPT）= <code>case_id, U_inf, yaw_1, yaw_2, pitch, rpm, power_1, power_2</code>（第一版 pitch/rpm 固定，故暂未含）。
+      • <code>optimizer_result.json</code> 字段 = <code>wind_speed, original_yaw, recommended_yaw, power_before, power_after, wake_field</code>。<br><br>
+      • <code>cases.csv</code> 最小字段（PPT）= <code>case_id, U_inf, yaw_1, yaw_2, pitch, rpm, power_1, power_2</code>。
     </div></div>
   </div>
 </main>

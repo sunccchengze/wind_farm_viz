@@ -152,6 +152,9 @@ select{background:var(--bg2);border:1px solid var(--line);color:var(--txt);
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
 .gallery img{width:100%;border-radius:12px;border:1px solid var(--line);transition:transform .3s,border-color .3s}
 .gallery img:hover{transform:scale(1.03);border-color:rgba(96,165,250,0.3)}
+/* Images in cards: blend white-bg PNGs into dark theme */
+.card img{background:#0b1220;border-radius:12px;border:1px solid var(--line);max-width:100%;display:block}
+.card .img-grid img{background:transparent}
 
 /* ===== CODE ===== */
 .code{font-family:"SFMono-Regular",Consolas,"Fira Code",monospace;font-size:12.5px;

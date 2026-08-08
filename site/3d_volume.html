@@ -6,7 +6,7 @@
 </head>
 <body>
 <nav><div class="nav-inner"><div class="brand">风电场偏航优化<br><span style="font-size:11px;color:var(--sub)">可视化模块</span></div>
-<div class="nav-links"><a href="index.html">首页</a><a href="wake.html">尾流</a><a href="optimization.html">优化</a><a href="overview.html">总览</a><a href="3d_surface.html">3D曲面</a><a href="3d_volume.html" class="active">3D体</a><a href="heatmap.html">热力矩阵</a><a href="solver.html">求解器</a><a href="pod.html">POD</a><a href="array.html">阵列</a><a href="power_tracking.html">功率跟踪</a><a href="dashboard.html">Dashboard</a><a href="windrose.html">风玫瑰</a><a href="model.html">模型精度</a><a href="interface.html">接口</a></div></div></nav>
+<div class="nav-links"></div></div></nav>
 <section class="wrap pg-hero"><h1>🫧 3D 体渲染</h1><p>真实三维尾流低速泡，可调阈值与透明度，含风机转子几何</p></section>
 <main class="wrap">
   <div class="card">
@@ -22,7 +22,7 @@
       <label><input type="checkbox" id="chkTurbines" checked> 风机</label>
     </div>
     <div id="plot3d" class="plotly-container" style="height:600px"></div>
-    <div class="note">蓝色半透明区域为尾流低速泡，白色圆圈为风机转子扫掠面。拖拽旋转，滚轮缩放。调整阈值改变尾流泡显示范围。</div>
+    <div class="note">蓝色半透明区域为尾流低速泡，白色圆圈为风机转子扫掠面。拖拽旋转，滚轮缩放。</div>
   </div>
 </main>
 <footer class="wrap">孙承泽 · 可视化模块</footer>
@@ -49,8 +49,7 @@
     const showSlices=document.getElementById('chkSlices').checked;
     const showTurb=document.getElementById('chkTurbines').checked;
     const fd=D3.fields_3d[yaw];if(!fd)return;
-    const x=fd.x,y=fd.y,z=fd.z,U=fd.u; // U[n_z][n_y][n_x]
-    // Flatten for Isosurface
+    const x=fd.x,y=fd.y,z=fd.z,U=fd.u;
     const xFlat=[],yFlat=[],zFlat=[],vFlat=[];
     for(let iz=0;iz<z.length;iz++)
       for(let iy=0;iy<y.length;iy++)
@@ -58,13 +57,11 @@
           xFlat.push(x[ix]);yFlat.push(y[iy]);zFlat.push(z[iz]);vFlat.push(U[iz][iy][ix]);
         }
     const traces=[];
-    // Isosurface
     traces.push({type:'isosurface',x:xFlat,y:yFlat,z:zFlat,value:vFlat,
       isomin:4.0,isomax:threshold,surface_count:3,
       colorscale:'Blues_r',showscale:true,
       colorbar:{title:'风速 (m/s)',thickness:15,len:0.6,x:1.02},
       opacity:opacity,caps:{x_show:false,y_show:false,z_show:false},name:'尾流区'});
-    // Hub-height slice
     if(showSlices){
       const hubZIdx=z.reduce((bi,zi,i)=>Math.abs(zi-90)<Math.abs(z[bi]-90)?i:bi,0);
       const uHub=U[hubZIdx];
@@ -72,11 +69,9 @@
         surfacecolor:uHub,colorscale:'RdBu_r',cmin:4,cmax:9,showscale:false,opacity:0.6,
         name:'轮毂截面 ('+Math.round(z[hubZIdx])+'m)'});
     }
-    // Turbine geometry
     if(showTurb){
       for(const[tx,lbl]of[[0,'风机1'],[630,'风机2']]){
         traces.push({type:'scatter3d',x:[tx,tx],y:[0,0],z:[0,90],mode:'lines',line:{color:'#fff',width:4},showlegend:false});
-        // Rotor circle
         const nPts=60,ry=[],rz=[];
         for(let i=0;i<nPts;i++){const a=2*Math.PI*i/nPts;ry.push(63*Math.sin(a));rz.push(90+63*Math.cos(a));}
         traces.push({type:'scatter3d',x:Array(nPts).fill(tx),y:ry,z:rz,mode:'lines',line:{color:'#fff',width:2},showlegend:false});
