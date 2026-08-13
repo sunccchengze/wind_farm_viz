@@ -1,0 +1,82 @@
+{
+  "formatVersion": 1,
+  "generatedAt": "2026-08-13",
+  "aggregateSources": [
+    {
+      "id": "turbine",
+      "repository": "https://github.com/sunccchengze/turbine-blade-ai-platform",
+      "ref": "arena/019feb03-turbine-blade-ai-platform",
+      "commit": "eacef4277622470f44edef8ca852e8d1d7a53cf6",
+      "path": "技能库&准则"
+    },
+    {
+      "id": "wind",
+      "repository": "https://github.com/sunccchengze/wind_farm_viz",
+      "ref": "arena/019feb53-wind-farm-viz",
+      "commit": "cf554c9a5429cec1206e9f496d2f2bfd6edeaa91",
+      "path": "技能库&准则"
+    },
+    {
+      "id": "repo",
+      "repository": "https://github.com/sunccchengze/-",
+      "ref": "arena/019ff697-repo",
+      "commit": "069c0aa03a8f79d88317c7567e8b21b8c7ea9a4f",
+      "path": "技能库&准则"
+    }
+  ],
+  "directSources": [
+    {
+      "id": "human-writing",
+      "repository": "https://github.com/KKKKhazix/human-writing",
+      "ref": "main",
+      "commit": "4fda173f3fef7fb808f3eba991eeb2528ea4b189",
+      "license": "MIT",
+      "installedAt": "skills/human-writing"
+    },
+    {
+      "id": "victor-design",
+      "repository": "https://github.com/victorzhang016-code/victor-design",
+      "ref": "main",
+      "commit": "79ebc14d9e7d2d1b9f87024588b5880eb1560ef2",
+      "license": "MIT",
+      "installedAt": "skills/victor-design"
+    },
+    {
+      "id": "openwiki",
+      "repository": "https://github.com/langchain-ai/openwiki",
+      "ref": "main",
+      "commit": "9fb009798a97baf0c0987b08cdac82233c801901",
+      "license": "MIT",
+      "installedAt": "tools/openwiki"
+    },
+    {
+      "id": "screencoder",
+      "repository": "https://github.com/leigest519/ScreenCoder",
+      "ref": "main",
+      "commit": "e7c2caefa59c00e7a770b70cfda3eebc77b82f17",
+      "license": "Apache-2.0",
+      "installedAt": "tools/screencoder",
+      "skillEntry": "skills/screencoder/SKILL.md",
+      "snapshotMode": "compact-runtime",
+      "exclusions": [
+        "post-training stacks",
+        "sample and generated media",
+        "runtime tmp/archive",
+        "UIED sample data and models",
+        "IDE/cache files"
+      ]
+    }
+  ],
+  "importPolicy": {
+    "mode": "compact-semantic-union",
+    "description": "保留每个不同技能正文；每个逻辑技能名选择一个资源完整主版本；同名不同正文保留为轻量变体；字节相同副本仅登记别名。",
+    "communityFileLimitBytes": 500000,
+    "excluded": [
+      "archives",
+      "large media and fonts",
+      "test fixtures",
+      "dependency/build directories",
+      "complete application trees adjacent to collection-root SKILL.md"
+    ]
+  }
+}
