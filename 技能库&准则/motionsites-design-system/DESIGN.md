@@ -1,6 +1,6 @@
 # Refero-Style DESIGN.md: 风电场偏航优化科研工作台设计规范
 
-> 本文件参照 styles.refero.design 标准编制，作为本平台所有 16 个静态子页面（Cloudflare Pages）与后续组件开发的设计宪法。
+> 本文件参照 styles.refero.design 标准编制，作为本平台所有 15 个静态子页面（Cloudflare Pages）与后续组件开发的设计宪法。
 
 ---
 

@@ -36,7 +36,7 @@ python3 "技能库&准.../scripts/search.py" "heatmap contour flow" -d chart
 | **1. 彻底消除 AI 廉价感 (Anti-Slop)** | 强制执行 `ui-reasoning.csv` 中的第 1 条规则：**严禁使用 Emoji 充当图标，必须使用精细矢量 SVG（Lucide/Heroicons）**；严禁粗暴大阴影。 | 优化 `site/index.html`、`wake.html` 及 `王牌PPT.pptx`，统一采用 1px 发丝边框与精准无衬线/宋体排版。 |
 | **2. 莫兰迪工科色盘与对比度** | 基于 `colors.csv` 与 `typography.csv`，确保背景底色与文字对比度严格 $\ge 4.5:1$（WCAG AA 级标准）。 | 静态站米白底色 `#F8F6F0` + 深岩板文本 `#1E293B` + 雾蓝 `#5B84B1` + 鼠尾草绿 `#6F8761`。 |
 | **3. Three.js 3D 视口与高度曲面** | 基于 `stacks/threejs.csv`，规范 WebGL 渲染循环、阻尼插值（Lerp）、抗锯齿（FXAA）与透明度混合（Blending）。 | 驱动 `site/3d_farm.html` 九机三维旋转与 `site/3d_surface.html` 高度速度剖面切片探针。 |
-| **4. 仪表盘高密度数据阶梯 (Density 8/10)** | 基于 `charts.csv` 与 `app-interface.csv`，锁定等宽数字（`tabular-nums`），杜绝实时数据刷新时的抖动与错位。 | 支撑 `site/dashboard.html` 闭环总控台与 `site/windrose.html` 16 扇区多花瓣风玫瑰。 |
+| **4. 仪表盘高密度数据阶梯 (Density 8/10)** | 基于 `charts.csv` 与 `app-interface.csv`，锁定等宽数字（`tabular-nums`），杜绝实时数据刷新时的抖动与错位。 | 支撑 `site/dashboard.html` 闭环总控台与 `site/model.html` 精度统计矩阵。 |
 
 ---
 
